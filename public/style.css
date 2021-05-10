@@ -1,0 +1,123 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#video-grid, #share-screen {
+    display: flex;
+    justify-content: center;
+}
+
+video {
+    height: 300px;
+    width: 400px;
+    transform: rotateY(180deg);
+    object-fit: cover;
+
+    /*left-right reverse*/
+    -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+    -moz-transform:rotateY(180deg); /* Firefox */
+}
+
+.main {
+    height: 100vh;
+    display: flex;
+}
+
+.main_left {
+    flex: 0.8;
+    display: flex;
+    flex-direction: column;
+}
+
+.main_right {
+    flex: 0.2;
+}
+
+.main_videos {
+    flex-grow: 1;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main_controller {
+    display: flex;
+    background-color: #1C1E20;
+    color: #D2D2D2;
+    padding: 5px;
+    justify-content: space-between;
+}
+
+.main_conroller_block {
+    display: flex;
+}
+
+.main_conroller_button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 10px;
+    min-width: 80px;
+    cursor: pointer;
+}
+
+.main_conroller_button i {
+    font-size: 24px;
+}
+
+.main_conroller_button:hover {
+    background-color: #343434;
+    border-radius: 5px;
+}
+
+.leave_meeting {
+    color: #EB534B;
+}
+
+.main_right {
+    display: flex;
+    flex-direction: column;
+    background-color: #242324;
+    border-left: 1px solid #3D3D42;
+}
+
+.main_header {
+    color: #F5F5F5;
+    text-align: center;
+}
+
+.main_chat_window {
+    flex-grow: 1;
+    overflow-y: scroll;
+}
+
+.main_massage_container {
+    padding: 22px 12px;
+    display: flex;
+}
+
+.main_massage_container input {
+    flex-grow: 1;
+    background-color: transparent;
+    border: none;
+    color: #F5F5F5;
+}
+
+.messages {
+    color: #F5F5F5;
+    list-style: none;
+}
+
+.unmute, .stop {
+    color: #EB534B;
+}
+
+video::-webkit-media-controls-play-button {display: none;}
+video::-webkit-media-controls-timeline {display: none;}
+video::-webkit-media-controls-current-time-display{display: none;}
+video::-webkit-media-controls-time-remaining-display {display: none;}
+video::-webkit-media-controls-mute-button {display: none;}
+video::-webkit-media-controls-volume-slider {display: none;}
