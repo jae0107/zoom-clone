@@ -52,5 +52,5 @@ io.on('connection', socket => {
 		})
 	});
 });
-
-server.listen(7000);
+console.log("PORT: ", process.env.PORT);
+server.listen(process.env.PORT || 7000);

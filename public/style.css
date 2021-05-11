@@ -1,18 +1,18 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: black;
 }
 
-#video-grid, #share-screen {
+#video-grid {
     display: flex;
     justify-content: center;
     overflow-x: scroll;
 }
 
-video {
-    height: 200px;
-    width: 300px;
+video {width: 300px;
     padding: 5px;
+    height:auto;
 
     transform: rotateY(180deg);
     object-fit: cover;
@@ -137,6 +137,50 @@ video {
     padding: 7px 15px 7px 15px;
     float: left;
     clear: both;
+}
+
+h1{
+    color: white;
+    text-align: center;
+    padding: 4%;
+    
+}
+
+div.button{
+    padding: 5px;
+    margin: auto;
+    width: 50%;
+}
+
+div.button button{
+    padding: 5px;
+    width: 100%;
+    font-size: 18px;
+}
+
+.image {
+    object-fit: cover;
+    padding: 4%;
+    flex: 1; 
+    text-align: center;
+}
+
+.parent{
+    display: flex;
+}
+
+.child{
+    position: relative;
+    flex: 1;
+}
+
+.right{
+    text-align: right;
+}
+
+img, button{
+    max-width:100%;
+    height:auto;
 }
 
 video::-webkit-media-controls-play-button {display: none;}

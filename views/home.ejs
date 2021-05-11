@@ -1,136 +1,34 @@
 <html>
-
     <head>
 		<meta charset="UTF-8">
     	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Delta Meet</title>
-        <style>
-			video {
-				height: 200px;
-				width: 300px;
-			}
-		</style>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    	<link rel="stylesheet" href="style.css">
+        <title>Zoom Clone Project</title>
+		<h1>Video Chat Web App</h1>
     </head>
     <body>
-		<a href="/room">Create a Room</a>
-        <h3 id="show-peer"></h3>
-		<div style="display: flex; justify-content: space-around; margin: 10px;">
-			<div style="width: 400px; height: 300px; border: 2px solid;" id="ourVideo">Our Video</div>
-			<div style="width: 400px; height: 300px; border: 2px solid;" id="remoteVideo">Remote Video</div>
+		<div class="parent">
+			<div class="child">
+				<img src="./image/Animated-Logo.gif" alt="My Image">
+			</div>
+			<div class="image">
+				<img src="./image/download.png" alt="My Image">
+			</div>
+			<div class="child right">
+				<img src="./image/Animated-Logo.gif" alt="My Image">
+			</div>
 		</div>
-		<input id="peerID" placeholder="Peer ID">
-		<button id="call-peer">Call Peer</button>
-		<button id="shareScreen">Share Screen</button>
-		<button id="stopScreenShare"> Stop Screen Share</button>
+			
+		<div class="button">
+			<button onclick="gotoRoom()">Create a Room
+		</div>
+		<script>
+			const gotoRoom = () => {
+    			window.location.href = '/room';
+			}
+		</script>
     </body>
-
-    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
-    <script>
-		window.addEventListener('load', (event) => {
-			let peer = new Peer();
-			let myStream;
-			let currentPeer;
-			let peerList = [];
-			peer.on('open', id => {
-				document.getElementById('show-peer').innerHTML = id;
-			});
-			peer.on('call', call => {
-				navigator.mediaDevices.getUserMedia({
-					video: true,
-					audio: true
-				}).then((stream) => {
-					myStream = stream;
-					addOurVideo(stream);
-					call.answer(stream);
-					call.on('stream', remoteStream => {
-						if(!peerList.includes(call.peer)){
-							addRemoteVideo(remoteStream);
-							currentPeer = call.peerConnection;
-							peerList.push(call.peer);
-						}
-					});
-				}).catch((err) => {
-					console.log(err + " unable to get media");
-				});
-			});
-
-			document.getElementById("call-peer").addEventListener('click', e => {
-				let remotePeerId = document.getElementById("peerID").value;
-				document.getElementById('show-peer').innerHTML = "Connecting " + remotePeerId;
-				callPeer(remotePeerId);
-			});
-
-			document.getElementById("shareScreen").addEventListener('click', e => {
-				navigator.mediaDevices.getDisplayMedia({
-					video: {
-						cursor: "always"
-					},
-					audio: {
-						echoCancellation: true,
-						noiseSuppression: true
-					}
-				}).then((stream) => {
-					let videoTrack = stream.getVideoTracks()[0];
-					videoTrack.onended = () => {
-						stopScreenShare();
-					}
-					var sender = currentPeer.getSenders().find(s => {
-						return s.track.kind == videoTrack.kind;
-					});
-					sender.replaceTrack(videoTrack);
-				}).catch((err) => {
-					console.log("unable to get display media" + err);
-				});
-			});
-
-			const callPeer = (id) => {
-				navigator.mediaDevices.getUserMedia({
-					video: true,
-					audio: true
-				}).then((stream) => {
-					myStream = stream;
-					addOurVideo(stream);
-					let call = peer.call(id, stream);
-					call.on('stream', remoteStream => {
-						if(!peerList.includes(call.peer)){
-							addRemoteVideo(remoteStream);
-							currentPeer = call.peerConnection;
-							peerList.push(call.peer);
-						}
-					});
-				}).catch((err) => {
-					console.log(err + " unable to get media");
-				});
-			}
-
-			document.getElementById("stopScreenShare").addEventListener('click', e => {
-				stopScreenShare();
-			});
-
-			const stopScreenShare = () => {
-				let videoTrack = myStream.getVideoTracks()[0];
-				var sender = currentPeer.getSenders().find(s => {
-					return s.track.kind == videoTrack.kind;
-				});
-				sender.replaceTrack(videoTrack);
-			}
-
-			const addRemoteVideo = (stream) => {
-				let video = document.createElement("video");
-				video.classList.add("vedio");
-				video.srcObject = stream;
-				video.play();
-				document.getElementById("remoteVideo").append(video);
-			}
-			const addOurVideo = (stream) => {
-				let video = document.createElement("video");
-				video.classList.add("vedio");
-				video.srcObject = stream;
-				video.play();
-				document.getElementById("ourVideo").append(video);
-			}
-		});
-	</script>
 
 </html>
