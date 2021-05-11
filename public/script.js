@@ -275,7 +275,7 @@ const change_name = () => {
 }
 
 const leave = () => {
-    window.location.href = 'http://localhost:7000/';
+    window.location.href = 'https://shrouded-island-88990.herokuapp.com/';
 }
 
 async function num(){
