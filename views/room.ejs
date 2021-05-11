@@ -16,6 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="alertify.core.css" />
 	<link rel="stylesheet" href="alertify.default.css" id="toggleCSS" />
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
     <script>
         const ROOM_ID = "<%= roomId %>";
     </script>
@@ -40,21 +41,22 @@
                     </div>
                 </div>
                 <div class="main_conroller_block">
-                    <div id="shareScreen"  class="main_conroller_button">
-                        <i class="fas fa-shield-alt"></i>
+                    <div id="shareScreen"  class="main_conroller_button main_share_button">
+                        <i class="fas fa-desktop"></i>
                         <span>Share Screen</span>
                     </div>
-                    <div class="main_conroller_button">
-                        <i class="fas fa-user-friends"></i>
-                        <span>Participants</span>
+                    <div onclick="num()" class="main_conroller_button">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Invite</span>
                     </div>
-                    <div class="main_conroller_button">
-                        <i class="fas fa-comment-alt"></i>
-                        <span>Chat</span>
+                    <div onclick="change_name()" class="main_conroller_button">
+                        <i class="fas fa-user-edit"></i>
+                        <span>Change name</span>
                     </div>
                 </div>
                 <div class="main_conroller_block">
-                    <div class="main_conroller_button">
+                    <div onclick="leave()" id="leave" class="main_conroller_button">
+                        <i class="leave_meeting fas fa-sign-out-alt"></i>
                         <span class="leave_meeting">Leave Meeting</span>
                     </div>
                 </div>
@@ -72,6 +74,7 @@
             </div>
         </div>
     </div>
+    <script src="sweetalert2.all.min.js"></script>
     <script src="alertify.min.js"></script>
     <script src="script.js"></script>
     

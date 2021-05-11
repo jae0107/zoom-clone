@@ -3,6 +3,7 @@ const video_grid = document.getElementById('video-grid');
 const my_video = document.createElement('video');
 my_video.muted = true;
 my_video.setAttribute("controls", "");
+my_video.setAttribute("id", "myVideo");
 
 var peer = new Peer(undefined, {
     path: '/peerjs',
@@ -29,6 +30,7 @@ navigator.mediaDevices.getUserMedia({
         //add new user stream
         const video = document.createElement('video');
         video.setAttribute("controls", "");
+        video.setAttribute("id", "peerVideo");
         call.on('stream', user_video_stream => {
             if(!peerList.includes(call.peerConnection)){
                 peerList.push(call.peerConnection);
@@ -41,7 +43,7 @@ navigator.mediaDevices.getUserMedia({
         connect_to_new_user(userId, stream, "ourVideo");
     });
 
-    socket.on('user-disconnected', userId => {
+    socket.on('user-disconnected', (userId, nickname) => {
         if (peers[userId]) {
             peers[userId].close();
         }
@@ -58,7 +60,12 @@ navigator.mediaDevices.getUserMedia({
     });
 
     socket.on('create_message', info => {
-        $('.messages').append(`<li class="message"><b>${info.nickname}</b><br>${info.msg}</li>`);
+        if(info.nickname === sessionStorage.getItem('ID')){
+            $('.messages').append(`<li class="message my-bubble"><b>${info.nickname}:</b><br>${info.msg}</li>`);
+        } else {
+            $('.messages').append(`<li class="message friend-bubble"><b>${info.nickname}:</b><br>${info.msg}</li>`);
+        }
+        
         scroll_to_bottom();
     });
 });
@@ -67,8 +74,10 @@ peer.on('open', id => {
     if(sessionStorage.length === 0){
         $(document).ready(() => {
             alertify.prompt("Enter your name", (e, str) => {
-                nickname = str;
-                sessionStorage.setItem('ID',nickname);
+                if(str !== ""){
+                    nickname = str;
+                }
+                sessionStorage.setItem('ID', nickname);
                 socket.emit('join-room', ROOM_ID, id, nickname);
                 
                 if (e) {
@@ -94,6 +103,8 @@ const connect_to_new_user = (userId, stream, share) => {
     //call user
     const call = peer.call(userId, stream);
     const video = document.createElement('video');
+    video.setAttribute("controls", "");
+    video.setAttribute("id", "peerVideo");
     //add new user stream to our own stream
     if(share !== "share"){
         call.on('stream', user_video_stream => {
@@ -116,15 +127,8 @@ const add_video_stream = (video, stream) => {
     video.addEventListener('loadedmetadata', () => {
         video.play();
     });
+    console.log(nickname);
     video_grid.append(video);
-}
-
-const add_share_screen = (video, stream) => {
-    video.srcObject = stream;
-    video.addEventListener('loadedmetadata', () => {
-        video.play();
-    });
-    share_screen.append(video);
 }
 
 //keep displaying the bottom of the chat window
@@ -191,30 +195,47 @@ const setPlayVideo = () => {
     document.querySelector('.main_video_button').innerHTML = html;
 }
 
+let attr_id = "";
+$('.main_share_button').click(function(){
+    attr_id = $(this).attr("id");
+});
+
 document.getElementById("shareScreen").addEventListener('click', e => {
-    navigator.mediaDevices.getDisplayMedia({
-        video: {
-            cursor: "always"
-        },
-        audio: {
-            echoCancellation: true,
-            noiseSuppression: true
-        }
-    }).then((stream) => {
-        let videoTrack = stream.getVideoTracks()[0];
-        videoTrack.onended = () => {
-            stopScreenShare();
-        }
-        
-        peerList.forEach((pc) => {
-            var sender = pc.getSenders().find(function(s) {
-                return s.track.kind == videoTrack.kind;
+    if (attr_id === "shareScreen"){
+        navigator.mediaDevices.getDisplayMedia({
+            video: {
+                cursor: "always"
+            },
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true
+            }
+        }).then((stream) => {
+            let videoTrack = stream.getVideoTracks()[0];
+            videoTrack.onended = () => {
+                stopScreenShare();
+            }
+            
+            peerList.forEach((pc) => {
+                var sender = pc.getSenders().find(s => {
+                    return s.track.kind == videoTrack.kind;
+                });
+                sender.replaceTrack(videoTrack);
             });
-            sender.replaceTrack(videoTrack);
+            
+            $("#shareScreen").attr('id', 'unshareScreen');
+            const html = `
+                <i class="stop fas fa-desktop"></i>
+                <span>Unshare Screen</span>
+            `
+            document.querySelector('.main_share_button').innerHTML = html;
+        }).catch((err) => {
+            console.log("unable to get display media" + err);
         });
-    }).catch((err) => {
-        console.log("unable to get display media" + err);
-    });
+    } else if (attr_id === "unshareScreen") {
+        stopScreenShare();
+    }
+    
 });
 
 const stopScreenShare = () => {
@@ -225,5 +246,96 @@ const stopScreenShare = () => {
         });
         sender.replaceTrack(videoTrack);
     });
-    sender.replaceTrack(videoTrack);
+
+    $("#unshareScreen").attr('id', 'shareScreen');
+    const html = `
+        <i class="fas fa-desktop"></i>
+        <span>Share Screen</span>
+    `
+    document.querySelector('.main_share_button').innerHTML = html;
+    //sender.replaceTrack(videoTrack);
+}
+
+const change_name = () => {
+    $(document).ready(() => {
+        alertify.prompt("Enter your name", (e, str) => {
+            nickname = str;
+            sessionStorage.removeItem('ID');
+            sessionStorage.setItem('ID', nickname);
+            socket.emit('change_name', nickname);
+            
+            if (e) {
+                alertify.success("You've clicked OK and typed: " + str);
+            } else {
+                alertify.error("You've clicked Cancel");
+            }
+        }, "");
+        return false;
+    });
+}
+
+const leave = () => {
+    window.location.href = 'http://localhost:7000/';
+}
+
+async function num(){
+    await Swal.fire({
+        title: 'Enter the number of Recipients',
+        html:
+            '<input id="swal-input1" class="swal2-input">',
+        focusConfirm: false
+    });
+    let tmp = document.getElementById('swal-input1').value;
+    if(tmp === "" || isNaN(tmp)){
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            footer: ''
+        });
+    } else {
+        send_invitation(document.getElementById('swal-input1').value);
+    }
+}
+
+async function send_invitation(num){
+    let str = "";
+  	for (let i = 1; i <= num; i++) {
+  		if(str === ""){
+  			str = `<input id="swal-input${i}" class="swal2-input">`;
+  		} else {
+  			str += `<input id="swal-input${i}" class="swal2-input">`;
+  		}
+  	}
+	await Swal.fire({
+		title: 'Enter Recipients Emails',
+		html:
+			str,
+		focusConfirm: false
+	});
+    let tmp = new Array();
+    for(let i = 1; i <= num; i++){
+        tmp.push(document.getElementById(`swal-input${i}`).value);
+    }
+    email(tmp);
+}
+
+const email = (receivers) => {
+    Email.send({
+        Host: "smtp.gmail.com",
+        Username: "ghjgjh0107@gmail.com",
+        Password: "ktkpnzvkhwwndjoq",
+        To: receivers,
+        From: "ghjgjh0107@gmail.com",
+        Subject: "Zoom Clone Chat Invitation",
+        Body: `Dear Sir or Madam,<br><br>You are invited to join the zoon clone chat. <br>The link is below. <br><br>${window.location.href}`,
+    }).then((message) => {
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Mail sent successfully',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    });
 }

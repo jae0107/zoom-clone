@@ -35,6 +35,10 @@ io.on('connection', socket => {
 		//socket.to(roomId).broadcast.emit('user-connected');
 		socket.to(roomId).emit('user-connected', userId); // to all clients in roomId except the sender
 
+		socket.on('change_name', changed_name => {
+			nickname = changed_name;
+		});
+
 		socket.on('message', message => {
 			let info = {
 				msg: message,
