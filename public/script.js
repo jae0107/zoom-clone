@@ -8,7 +8,7 @@ my_video.setAttribute("id", "myVideo");
 var peer = new Peer(undefined, {
     path: '/peerjs',
     host: '/',
-    port: '80'
+    port: '443'
 }); 
 
 let nickname = "user";
