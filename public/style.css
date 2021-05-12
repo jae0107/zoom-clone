@@ -10,7 +10,8 @@ body {
     overflow-x: scroll;
 }
 
-video {width: 300px;
+video {
+    width: 300px;
     padding: 5px;
     height:auto;
 
@@ -150,6 +151,7 @@ div.button{
     padding: 5px;
     margin: auto;
     width: 50%;
+    flex-direction: column;
 }
 
 div.button button{
@@ -176,6 +178,8 @@ div.button button{
 
 .right{
     text-align: right;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
 }
 
 img, button{

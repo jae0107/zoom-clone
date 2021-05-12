@@ -15,7 +15,6 @@ app.use(express.static('public'));
 app.use('/peerjs', peerServer);
 app.get('/', (req, res) => {
 	res.render('home');
-	//res.redirect(`/${uuidv4()}`);
 });
 
 app.get('/room', (req, res) => {
@@ -33,8 +32,8 @@ io.on('connection', socket => {
 		//user_nickname = nickname;
 		//socket.broadcast.emit('user-connected'); // to all clients in the current namespace except the sender
 		//socket.to(roomId).broadcast.emit('user-connected');
-		socket.to(roomId).emit('user-connected', userId); // to all clients in roomId except the sender
-
+		socket.to(roomId).emit('user-connected', userId, nickname); // to all clients in roomId except the sender
+		console.log("connect", nickname, userId);
 		socket.on('change_name', changed_name => {
 			nickname = changed_name;
 		});
@@ -49,8 +48,8 @@ io.on('connection', socket => {
 
 		socket.on('disconnect', () => {
 			socket.to(roomId).emit('user-disconnected', userId);
-		})
+			console.log("disconnect", nickname, userId);
+		});
 	});
 });
-console.log("PORT: ", process.env.PORT);
 server.listen(process.env.PORT || 7000);

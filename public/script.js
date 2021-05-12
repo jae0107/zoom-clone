@@ -9,6 +9,7 @@ var peer = new Peer(undefined, {
     path: '/peerjs',
     host: '/',
     port: '443'
+    //port: '7000'
 }); 
 
 let nickname = "user";
@@ -30,20 +31,25 @@ navigator.mediaDevices.getUserMedia({
         //add new user stream
         const video = document.createElement('video');
         video.setAttribute("controls", "");
-        video.setAttribute("id", "peerVideo");
+        video.setAttribute("id", call.peer);
+
         call.on('stream', user_video_stream => {
             if(!peerList.includes(call.peerConnection)){
                 peerList.push(call.peerConnection);
             }
             add_video_stream(video, user_video_stream);
         });
+        
+        peers[call.peer] = call;
     });
 
-    socket.on('user-connected', (userId) => {
-        connect_to_new_user(userId, stream, "ourVideo");
+    socket.on('user-connected', (userId, nickname) => {
+        connect_to_new_user(userId, stream, nickname);
     });
 
-    socket.on('user-disconnected', (userId, nickname) => {
+    socket.on('user-disconnected', (userId) => {
+        document.getElementById(userId).remove();
+
         if (peers[userId]) {
             peers[userId].close();
         }
@@ -99,21 +105,20 @@ $("#success").on( 'click', () => {
     return false;
 });
 
-const connect_to_new_user = (userId, stream, share) => {
+const connect_to_new_user = (userId, stream, nickname) => {
     //call user
     const call = peer.call(userId, stream);
     const video = document.createElement('video');
     video.setAttribute("controls", "");
-    video.setAttribute("id", "peerVideo");
+    video.setAttribute("id", userId);
+
     //add new user stream to our own stream
-    if(share !== "share"){
-        call.on('stream', user_video_stream => {
-            if(!peerList.includes(call.peerConnection)){
-                peerList.push(call.peerConnection);
-            }
-            add_video_stream(video, user_video_stream);
-        });
-    }
+    call.on('stream', user_video_stream => {
+        if(!peerList.includes(call.peerConnection)){
+            peerList.push(call.peerConnection);
+        }
+        add_video_stream(video, user_video_stream);
+    });
 
     call.on('close', () => {
         video.remove();
@@ -127,7 +132,6 @@ const add_video_stream = (video, stream) => {
     video.addEventListener('loadedmetadata', () => {
         video.play();
     });
-    console.log(nickname);
     video_grid.append(video);
 }
 
@@ -196,7 +200,7 @@ const setPlayVideo = () => {
 }
 
 let attr_id = "";
-$('.main_share_button').click(function(){
+$('.main_share_button').click(() => {
     attr_id = $(this).attr("id");
 });
 
@@ -276,17 +280,18 @@ const change_name = () => {
 
 const leave = () => {
     window.location.href = 'https://shrouded-island-88990.herokuapp.com/';
+    //window.location.href = 'http://localhost:7000/';
 }
 
 async function num(){
     await Swal.fire({
-        title: 'Enter the number of Recipients',
+        title: 'Enter the number of Guests',
         html:
             '<input id="swal-input1" class="swal2-input">',
         focusConfirm: false
     });
     let tmp = document.getElementById('swal-input1').value;
-    if(tmp === "" || isNaN(tmp)){
+    if(tmp === "" || isNaN(tmp) || tmp === 0){
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
@@ -307,12 +312,14 @@ async function send_invitation(num){
   			str += `<input id="swal-input${i}" class="swal2-input">`;
   		}
   	}
+      
 	await Swal.fire({
-		title: 'Enter Recipients Emails',
+		title: 'Enter Guests Emails',
 		html:
 			str,
 		focusConfirm: false
 	});
+
     let tmp = new Array();
     for(let i = 1; i <= num; i++){
         tmp.push(document.getElementById(`swal-input${i}`).value);
@@ -328,10 +335,10 @@ const email = (receivers) => {
         To: receivers,
         From: "ghjgjh0107@gmail.com",
         Subject: "Zoom Clone Chat Invitation",
-        Body: `Dear Sir or Madam,<br><br>You are invited to join the zoon clone chat. <br>The link is below. <br><br>${window.location.href}`,
+        Body: `Dear Sir or Madam,<br><br>You are invited by ${sessionStorage.getItem('ID')} to join the zoom clone chat. <br><br>The link is below. <br><br>${window.location.href} <br><br>Best regards, <br>Zoom Clone Project Team`,
     }).then((message) => {
         Swal.fire({
-            position: 'top-end',
+            position: 'center',
             icon: 'success',
             title: 'Mail sent successfully',
             showConfirmButton: false,
