@@ -48,7 +48,7 @@ navigator.mediaDevices.getUserMedia({
     });
 
     socket.on('user-disconnected', (userId) => {
-        document.getElementById(userId).remove();
+        //document.getElementById(userId).remove();
 
         if (peers[userId]) {
             peers[userId].close();
@@ -200,12 +200,14 @@ const setPlayVideo = () => {
 }
 
 let attr_id = "";
-$('.main_share_button').click(() => {
+$(".main_share_button").click (function(){
     attr_id = $(this).attr("id");
-});
+})
 
 document.getElementById("shareScreen").addEventListener('click', e => {
+    //console.log("share");
     if (attr_id === "shareScreen"){
+        //console.log("share1");
         navigator.mediaDevices.getDisplayMedia({
             video: {
                 cursor: "always"
