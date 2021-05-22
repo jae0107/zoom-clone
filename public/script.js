@@ -48,7 +48,7 @@ navigator.mediaDevices.getUserMedia({
     });
 
     socket.on('user-disconnected', (userId) => {
-        //document.getElementById(userId).remove();
+        document.getElementById(userId).remove();
 
         if (peers[userId]) {
             peers[userId].close();
