@@ -1,6 +1,6 @@
 # zoom-clone
 
-This is a video chat application.
+This is a video chat application developed in Express.js and Peer.js.
 
 # installation
 
